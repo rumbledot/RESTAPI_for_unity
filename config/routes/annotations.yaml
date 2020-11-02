@@ -1,0 +1,12 @@
+controllers:
+    resource: ../../src/Controller/
+    type: annotation
+
+scores:
+    resource: ../../src/Controller/HighScoreController.php
+    type: annotation
+    prefix: /scores
+
+kernel:
+    resource: ../../src/Kernel.php
+    type: annotation

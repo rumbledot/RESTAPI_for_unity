@@ -1,0 +1,140 @@
+goto xampp/htdocs folder
+
+run gitBash here
+run 'composer create-project symfony/skeleton unityDB'
+
+goto xampp\apache\conf\extra
+open httpd-vhosts.conf file using notepad
+add this block of code at the end:
+    <VirtualHost *:80>
+        DocumentRoot "C:/Users/Abram/SDK/xampp/htdocs/unityDB/public"
+        ServerName unity.test
+    </VirtualHost>
+
+goto C:\Windows\System32\drivers\etc
+open hosts file using notepad as admin
+add this line of code at the end:
+    127.0.0.1 unity.test
+
+restart xampp apache server
+try open unity.test on Chrome to test
+
+goto unityDB/ folder
+run 'code .'
+
+goto public folder
+create new .htaccess file
+add this block of code:
+    <IfModule mod_rewrite.c>
+        RewriteEngine On
+
+        # Determine the RewriteBase automatically and set it as environment variable.
+        RewriteCond %{REQUEST_URI}::$1 ^(/.+)/(.*)::\2$
+        RewriteRule ^(.*) - [E=BASE:%1]
+
+        # If the requested filename exists, simply serve it.
+        # We only want to let Apache serve files and not directories.
+        RewriteCond %{REQUEST_FILENAME} -f
+        RewriteRule .? - [L]
+
+        # Rewrite all other queries to the front controller.
+        RewriteRule .? %{ENV:BASE}/index.php [L]
+    </IfModule>
+
+goto Controller folder
+create new BlogController.php file
+as alternative
+run 'composer require symfony/asset'
+run 'composer require symfony/maker-bundle'
+run 'php bin/console generate:controller'
+
+two ways of setting routes
+#1composer
+goto config folder
+open routes.yaml file
+and add routes we going to use
+#2
+run 'composer require annotations'
+use annotation route module in BlogController.php
+/**
+     * @Route("/", name="blog_list")
+
+to specify/restrict method
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+    * @Method({"GET"})
+     */
+
+it will look like this:
+    /**
+     * @Route("/", name="blog_list")
+     * @Method({"GET"})
+     */
+
+automatically convert json body
+run 'composer require symfony-bundles/json-request-bundle'
+public function indexAction(Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+
+    // uses request data
+    $name = isset($data['name']) ? $data['name'] : null;
+}
+Now you can work with json-request as with standard request:
+
+public function indexAction(Request $request)
+{
+    $name = $request->get('name');
+}
+
+database ORM - Doctrine
+run 'composer require doctrine maker'
+open .env file
+change database specs
+
+automatically create database
+run 'php bin/console doctrine:database:create'
+create model (entity)
+run 'php bin/console make:entity Blog'
+goto Entity folder
+
+generate schema
+run 'php bin/console doctrine:migrations:diff'
+keep track database changes based on entity class
+run 'php bin/console doctrine:migrations:migrate'
+automatically create tables in database based on model entity
+
+how to query the database from powershell
+run 'php bin/console doctrine:query:sql 'SELECT * FROM blog''
+
+Installing js routing helper
+run 'composer require friendsofsymfony/jsrouting-bundle'
+run 'php bin/console assets:install --symlink public'
+
+Symfony annotations route
+@Route("/page/{value}",                     => http url
+        default={"value"="something"},      => give  a default value to route var
+        requirement={"value"="alt1|alt2"}   => limits value to alt1 / alt2
+        name={"_page_name"}                 => name that can be called using path() /
+                                                $this->generateUrl()                                        Routing.generate()
+        options={"expose":true}             => expose this route, so ajax can access it
+)
+
+Symfony getting class/component from project bundle
+in this case getting a twig extension class
+$this->container->get('twig')->getExtension(Extension::class)
+
+Doctrine Querybuilder
+get the manager
+$em         = $this->get('doctrine')->getManager();
+start building query
+$qb         = $qb->createQueryBuilder();
+$qb     -> select('*')
+        -> where('par1 = :val1 OR par2 = :val2')
+        -> andWhere('par3 = :val3')
+        -> setParameter ('val1', $val1)
+        ->orderBy ('column', 'DESC/ASC');
+execute and get results
+$blogs  = $qb->getQuery()->getResult();
+
+dump() with proper styling
+run 'composer require symfony/debug-bundle'

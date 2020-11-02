@@ -1,0 +1,7 @@
+index:
+    path: /
+    controller: App\Controller\HighScoreController::index
+
+blog:
+    path: /scores
+    controller: App\Controller\HighScoreController
